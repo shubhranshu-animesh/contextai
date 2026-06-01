@@ -59,16 +59,11 @@ async def process_rag_query(payload: QueryRequest):
                 raise HTTPException(status_code=404, detail=f"Target file '{payload.pdf_name}' not found. Please upload it first.")
 
             ingestion = IngestionPipeline()
-            db_exists = os.path.exists("./data/chroma_db") and len(os.listdir("./data/chroma_db")) > 0
-
-            if not db_exists:
-                raw_chunks = ingestion.process_document(pdf_path)
-                ingestion.populate_vector_store(raw_chunks)
-                chunk_strings = [chunk.page_content for chunk in raw_chunks]
-            else:
-                db = ingestion.get_vector_store_instance()
-                collection_data = db.get()
-                chunk_strings = collection_data['documents']
+            
+            # Re-parse the active document for the local BM25 index
+            # (Dense embeddings are safely stored in Pinecone!)
+            raw_chunks = ingestion.process_document(pdf_path)
+            chunk_strings = [chunk.page_content for chunk in raw_chunks]
 
             retriever = HybridRetriever(raw_documents=chunk_strings)
             dense_results = retriever.dense_search(payload.query, k=5)
