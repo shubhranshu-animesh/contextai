@@ -23,7 +23,6 @@ class Message(BaseModel):
 
 class QueryRequest(BaseModel):
     query: str = Field(..., min_length=3, max_length=500)
-    # Updated: Allow pdf_name to be null for general chatting
     pdf_name: str | None = Field(default=None, description="The target document file name. None if general chat.")
     history: list[Message] = Field(default=[], description="Previous conversation history")
 
@@ -31,6 +30,9 @@ class QueryRequest(BaseModel):
 async def upload_and_index_document(file: UploadFile = File(...)):
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+    
+    # Ensure the directory exists before trying to save the file
+    os.makedirs("./data", exist_ok=True) 
     
     file_path = f"./data/{file.filename}"
     with open(file_path, "wb") as buffer:
