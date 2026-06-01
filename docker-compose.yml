@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  contextai-backend:
+    build: .
+    container_name: contextai_service
+    ports:
+      - "8000:8000"
+    # This maps your local ./data folder to the container's /code/data folder
+    # This ensures your uploaded PDFs and ChromaDB embeddings survive reboots!
+    volumes:
+      - ./data:/code/data
+    # This automatically injects your GROQ_API_KEY into the container
+    env_file:
+      - .env
+    restart: unless-stopped

@@ -1,0 +1,15 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+
+# Ignore the virtual environment
+venv/
+
+# Ignore the secrets file so it never goes to GitHub!
+.env
+
+# Ignore database and cache files (we will make these later)
+chromadb_store/
+data/
+logs/
+__pycache__/
+*.pyc
+.DS_Store
